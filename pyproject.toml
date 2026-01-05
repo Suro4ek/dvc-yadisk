@@ -1,0 +1,70 @@
+[project]
+name = "dvc-yadisk"
+version = "0.1.0"
+description = "Yandex Disk remote storage plugin for DVC"
+readme = "README.md"
+license = "Apache-2.0"
+authors = [
+    { name = "1Suro1", email = "timu.zaxarov@gmail.com" }
+]
+keywords = ["dvc", "yandex", "yadisk", "yandex-disk", "storage", "mlops", "data-version-control"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "dvc>=3.0.0",
+    "yadisk>=3.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "pytest-mock>=3.10",
+    "mypy>=1.0",
+    "ruff>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/1Suro1/dvc-yadisk"
+Repository = "https://github.com/1Suro1/dvc-yadisk"
+Issues = "https://github.com/1Suro1/dvc-yadisk/issues"
+
+[project.scripts]
+dvc-yadisk-enable = "dvc_yadisk.cli:enable"
+dvc-yadisk-disable = "dvc_yadisk.cli:disable"
+
+[project.entry-points."fsspec.specs"]
+yadisk = "dvc_yadisk:YaDiskFileSystem"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dvc_yadisk"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+ignore_missing_imports = true
