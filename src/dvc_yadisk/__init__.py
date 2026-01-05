@@ -3,7 +3,7 @@
 from dvc_yadisk.fs import YaDiskFileSystem
 
 __all__ = ["YaDiskFileSystem"]
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 def _register_with_dvc() -> None:
