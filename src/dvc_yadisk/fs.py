@@ -10,7 +10,8 @@ from typing import Any, ClassVar
 
 from dvc_objects.fs.base import ObjectFileSystem
 from funcy import cached_property, wrap_prop
-from yadisk import Client
+from yadisk import AsyncClient, Client
+from yadisk.exceptions import PathNotFoundError
 
 
 class YaDiskFileSystem(ObjectFileSystem):
@@ -18,25 +19,38 @@ class YaDiskFileSystem(ObjectFileSystem):
     Yandex Disk filesystem implementation for DVC.
 
     Uses the yadisk library to interact with Yandex Disk REST API.
-    Supports OAuth token-based authentication.
+    Supports OAuth token-based authentication with async parallel uploads.
     """
 
     protocol = "yadisk"
     PARAM_CHECKSUM = "md5"
     REQUIRES: ClassVar[dict[str, str]] = {"yadisk": "yadisk"}
     TRAVERSE_WEIGHT_MULTIPLIER = 1
+    async_impl = True  # Enable async for parallel uploads
 
     def __init__(self, **kwargs: Any) -> None:
-        """
-        Initialize YaDiskFileSystem.
-
-        Args:
-            **kwargs: Configuration options including:
-                - token: OAuth token (or use YADISK_TOKEN env var)
-        """
+        """Initialize YaDiskFileSystem."""
         super().__init__(**kwargs)
         self._yadisk_client: Client | None = None
+        self._async_client: AsyncClient | None = None
         self._yadisk_lock = threading.Lock()
+        self._created_dirs: set[str] = set()
+        self._token: str | None = None
+
+    def _get_token(self) -> str:
+        """Get OAuth token."""
+        if self._token is None:
+            self._token = (
+                self.config.get("token")
+                or self.fs_args.get("token")
+                or os.environ.get("YADISK_TOKEN")
+            )
+            if not self._token:
+                raise ValueError(
+                    "Yandex Disk token is required. "
+                    "Set via 'token' config or YADISK_TOKEN env var."
+                )
+        return self._token
 
     @classmethod
     def _strip_protocol(cls, path: str) -> str:
@@ -61,23 +75,25 @@ class YaDiskFileSystem(ObjectFileSystem):
         return path
 
     def _get_yadisk_client(self) -> Client:
-        """Get or create yadisk client (thread-safe)."""
+        """Get or create sync yadisk client (thread-safe)."""
         if self._yadisk_client is None:
             with self._yadisk_lock:
                 if self._yadisk_client is None:
-                    token = self.fs_args.get("token") or os.environ.get("YADISK_TOKEN")
-                    if not token:
-                        raise ValueError(
-                            "Yandex Disk token is required. "
-                            "Set via 'token' config or YADISK_TOKEN env var."
-                        )
-
+                    token = self._get_token()
                     client = Client(token=token)
                     if not client.check_token():
                         raise ValueError("Invalid Yandex Disk token")
-
                     self._yadisk_client = client
         return self._yadisk_client
+
+    async def _get_async_client(self) -> AsyncClient:
+        """Get or create async yadisk client."""
+        if self._async_client is None:
+            token = self._get_token()
+            self._async_client = AsyncClient(token=token)
+            if not await self._async_client.check_token():
+                raise ValueError("Invalid Yandex Disk token")
+        return self._async_client
 
     @wrap_prop(threading.Lock())  # type: ignore[untyped-decorator]
     @cached_property  # type: ignore[untyped-decorator]
@@ -102,7 +118,10 @@ class YaDiskFileSystem(ObjectFileSystem):
         """List directory contents."""
         client = self._get_yadisk_client()
         norm_path = self._normalize_path(self._strip_protocol(path))
-        items = list(client.listdir(norm_path))
+        try:
+            items = list(client.listdir(norm_path))
+        except PathNotFoundError:
+            return []
 
         if detail:
             return [
@@ -120,11 +139,15 @@ class YaDiskFileSystem(ObjectFileSystem):
     def find(  # type: ignore[override]
         self,
         path: str,
-        prefix: str = "",
+        prefix: bool | str = False,
         maxdepth: int | None = None,
         **kwargs: Any,
     ) -> Iterator[str]:
         """Recursively find all files under path."""
+        prefix_str = ""
+        if isinstance(prefix, str):
+            prefix_str = prefix
+
         client = self._get_yadisk_client()
         base_path = self._strip_protocol(path)
         norm_path = self._normalize_path(base_path)
@@ -136,19 +159,20 @@ class YaDiskFileSystem(ObjectFileSystem):
             try:
                 for item in client.listdir(current_path):
                     item_path = self._strip_disk_prefix(item.path or "")
-                    # Remove leading slash for consistency
                     item_path = item_path.lstrip("/")
 
                     if not item_path:
                         continue
 
-                    if prefix and not (item.name or "").startswith(prefix):
+                    if prefix_str and not (item.name or "").startswith(prefix_str):
                         continue
 
                     if item.type == "dir":
                         yield from _find_recursive(item.path or "", depth + 1)
                     else:
                         yield item_path
+            except PathNotFoundError:
+                return
             except Exception:
                 return
 
@@ -158,7 +182,6 @@ class YaDiskFileSystem(ObjectFileSystem):
         self, path: str | list[str], batch_size: int | None = None, **kwargs: Any
     ) -> bool | list[bool]:
         """Check if path(s) exist."""
-        # Handle batch exists for DVC compatibility
         if isinstance(path, (list, tuple)):
             return [self._single_exists(p) for p in path]
         return self._single_exists(path)
@@ -230,6 +253,25 @@ class YaDiskFileSystem(ObjectFileSystem):
         norm_path = self._normalize_path(self._strip_protocol(path))
         client.remove(norm_path, permanently=True)
 
+    def open(  # type: ignore[override]
+        self,
+        path: str,
+        mode: str = "rb",
+        **kwargs: Any,
+    ) -> io.BytesIO:
+        """Open a file for reading or writing."""
+        if "r" in mode:
+            try:
+                data = self.cat_file(path)
+                buffer = io.BytesIO(data)
+                return buffer
+            except PathNotFoundError as e:
+                raise FileNotFoundError(f"File not found: {path}") from e
+        elif "w" in mode:
+            return io.BytesIO()
+        else:
+            raise ValueError(f"Unsupported mode: {mode}")
+
     def cat_file(self, path: str, **kwargs: Any) -> bytes:  # type: ignore[override]
         """Read file contents."""
         client = self._get_yadisk_client()
@@ -239,19 +281,33 @@ class YaDiskFileSystem(ObjectFileSystem):
         buffer.seek(0)
         return buffer.read()
 
+    def _ensure_parent_dir(self, norm_path: str) -> None:
+        """Ensure parent directory exists (with caching)."""
+        parent = "/".join(norm_path.split("/")[:-1])
+        if parent and parent != "/" and parent not in self._created_dirs:
+            try:
+                self._get_yadisk_client().makedirs(parent)
+                self._created_dirs.add(parent)
+            except Exception:
+                self._created_dirs.add(parent)
+
+    async def _ensure_parent_dir_async(self, norm_path: str) -> None:
+        """Ensure parent directory exists (async version with caching)."""
+        parent = "/".join(norm_path.split("/")[:-1])
+        if parent and parent != "/" and parent not in self._created_dirs:
+            try:
+                client = await self._get_async_client()
+                await client.makedirs(parent)
+                self._created_dirs.add(parent)
+            except Exception:
+                self._created_dirs.add(parent)
+
+    # Sync versions (fallback)
     def pipe_file(self, path: str, data: bytes, **kwargs: Any) -> None:  # type: ignore[override]
         """Write data to file."""
         client = self._get_yadisk_client()
         norm_path = self._normalize_path(self._strip_protocol(path))
-
-        # Ensure parent directory exists
-        parent = "/".join(norm_path.split("/")[:-1])
-        if parent and parent != "/":
-            try:
-                client.makedirs(parent)
-            except Exception:
-                pass
-
+        self._ensure_parent_dir(norm_path)
         buffer = io.BytesIO(data)
         client.upload(buffer, norm_path, overwrite=True)
 
@@ -265,16 +321,39 @@ class YaDiskFileSystem(ObjectFileSystem):
         """Upload file from local path to Yandex Disk."""
         client = self._get_yadisk_client()
         norm_path = self._normalize_path(self._strip_protocol(rpath))
-
-        # Ensure parent directory exists
-        parent = "/".join(norm_path.split("/")[:-1])
-        if parent and parent != "/":
-            try:
-                client.makedirs(parent)
-            except Exception:
-                pass
-
+        self._ensure_parent_dir(norm_path)
         client.upload(lpath, norm_path, overwrite=True)
+
+    # Async versions for parallel operations
+    async def _put_file(self, lpath: str, rpath: str, **kwargs: Any) -> None:
+        """Async upload file from local path to Yandex Disk."""
+        client = await self._get_async_client()
+        norm_path = self._normalize_path(self._strip_protocol(rpath))
+        await self._ensure_parent_dir_async(norm_path)
+        await client.upload(lpath, norm_path, overwrite=True)
+
+    async def _get_file(self, rpath: str, lpath: str, **kwargs: Any) -> None:
+        """Async download file from Yandex Disk to local path."""
+        client = await self._get_async_client()
+        norm_path = self._normalize_path(self._strip_protocol(rpath))
+        await client.download(norm_path, lpath)
+
+    async def _pipe_file(self, path: str, data: bytes, **kwargs: Any) -> None:
+        """Async write data to file."""
+        client = await self._get_async_client()
+        norm_path = self._normalize_path(self._strip_protocol(path))
+        await self._ensure_parent_dir_async(norm_path)
+        buffer = io.BytesIO(data)
+        await client.upload(buffer, norm_path, overwrite=True)
+
+    async def _cat_file(self, path: str, **kwargs: Any) -> bytes:
+        """Async read file contents."""
+        client = await self._get_async_client()
+        norm_path = self._normalize_path(self._strip_protocol(path))
+        buffer = io.BytesIO()
+        await client.download(norm_path, buffer)
+        buffer.seek(0)
+        return buffer.read()
 
     def cp_file(self, path1: str, path2: str, **kwargs: Any) -> None:  # type: ignore[override]
         """Copy file within Yandex Disk."""
