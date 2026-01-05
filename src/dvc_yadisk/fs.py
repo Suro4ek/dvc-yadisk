@@ -281,15 +281,21 @@ class YaDiskFileSystem(ObjectFileSystem):
         buffer.seek(0)
         return buffer.read()
 
+    def _cache_parent_chain(self, norm_path: str) -> None:
+        """Cache all parent directories in path."""
+        parts = norm_path.split("/")
+        for i in range(2, len(parts)):
+            self._created_dirs.add("/".join(parts[:i]))
+
     def _ensure_parent_dir(self, norm_path: str) -> None:
         """Ensure parent directory exists (with caching)."""
         parent = "/".join(norm_path.split("/")[:-1])
         if parent and parent != "/" and parent not in self._created_dirs:
             try:
                 self._get_yadisk_client().makedirs(parent)
-                self._created_dirs.add(parent)
             except Exception:
-                self._created_dirs.add(parent)
+                pass
+            self._cache_parent_chain(norm_path)
 
     async def _ensure_parent_dir_async(self, norm_path: str) -> None:
         """Ensure parent directory exists (async version with caching)."""
@@ -298,9 +304,9 @@ class YaDiskFileSystem(ObjectFileSystem):
             try:
                 client = await self._get_async_client()
                 await client.makedirs(parent)
-                self._created_dirs.add(parent)
             except Exception:
-                self._created_dirs.add(parent)
+                pass
+            self._cache_parent_chain(norm_path)
 
     # Sync versions (fallback)
     def pipe_file(self, path: str, data: bytes, **kwargs: Any) -> None:  # type: ignore[override]

@@ -25,11 +25,9 @@ This creates a `sitecustomize.py` file in your Python environment that loads the
 
 ### 1. Get Yandex Disk OAuth Token
 
-1. Go to [Yandex OAuth](https://oauth.yandex.ru/client/new/api)
-2. Create a new application 
-3. Add permissions: `cloud_api:disk.read`, `cloud_api:disk.write`
-4. Generate a debug token or implement OAuth flow https://oauth.yandex.ru/authorize?response_type=token&client_id=
-5. Copy the token
+1. Go to [Yandex Poginon](https://yandex.ru/dev/disk/poligon)
+2. Create a token
+3. Copy the token
 
 ### 2. Configure DVC Remote
 
