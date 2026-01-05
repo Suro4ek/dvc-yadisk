@@ -5,9 +5,12 @@ from __future__ import annotations
 import io
 import os
 import threading
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from dvc_objects.fs.base import ObjectFileSystem
+
+if TYPE_CHECKING:
+    from yadisk import Client
 from funcy import cached_property, wrap_prop
 
 
@@ -33,7 +36,7 @@ class YaDiskFileSystem(ObjectFileSystem):
                 - token: OAuth token (or use YADISK_TOKEN env var)
         """
         super().__init__(**kwargs)
-        self._yadisk_client = None
+        self._yadisk_client: Client | None = None
         self._yadisk_lock = threading.Lock()
 
     @classmethod
@@ -79,13 +82,13 @@ class YaDiskFileSystem(ObjectFileSystem):
                     self._yadisk_client = client
         return self._yadisk_client
 
-    @wrap_prop(threading.Lock())
-    @cached_property
+    @wrap_prop(threading.Lock())  # type: ignore[untyped-decorator]
+    @cached_property  # type: ignore[untyped-decorator]
     def fs(self) -> YaDiskFileSystem:
         """Return self as the filesystem (required by ObjectFileSystem)."""
         return self
 
-    def info(self, path: str, **kwargs: Any) -> dict[str, Any]:
+    def info(self, path: str, **kwargs: Any) -> dict[str, Any]:  # type: ignore[override]
         """Get file/directory metadata."""
         client = self._get_yadisk_client()
         norm_path = self._normalize_path(self._strip_protocol(path))
@@ -98,7 +101,7 @@ class YaDiskFileSystem(ObjectFileSystem):
             "md5": getattr(meta, "md5", None),
         }
 
-    def ls(self, path: str, detail: bool = False, **kwargs: Any) -> list[Any]:
+    def ls(self, path: str, detail: bool = False, **kwargs: Any) -> list[Any]:  # type: ignore[override]
         """List directory contents."""
         client = self._get_yadisk_client()
         norm_path = self._normalize_path(self._strip_protocol(path))
@@ -117,7 +120,7 @@ class YaDiskFileSystem(ObjectFileSystem):
             ]
         return [self._strip_disk_prefix(item.path) for item in items]
 
-    def exists(
+    def exists(  # type: ignore[override]
         self, path: str | list[str], batch_size: int | None = None, **kwargs: Any
     ) -> bool | list[bool]:
         """Check if path(s) exist."""
@@ -131,7 +134,8 @@ class YaDiskFileSystem(ObjectFileSystem):
         try:
             client = self._get_yadisk_client()
             norm_path = self._normalize_path(self._strip_protocol(path))
-            return client.exists(norm_path)
+            result: bool = client.exists(norm_path)
+            return result
         except Exception:
             return False
 
@@ -140,7 +144,8 @@ class YaDiskFileSystem(ObjectFileSystem):
         try:
             client = self._get_yadisk_client()
             norm_path = self._normalize_path(self._strip_protocol(path))
-            return client.is_dir(norm_path)
+            result: bool = client.is_dir(norm_path)
+            return result
         except Exception:
             return False
 
@@ -149,7 +154,8 @@ class YaDiskFileSystem(ObjectFileSystem):
         try:
             client = self._get_yadisk_client()
             norm_path = self._normalize_path(self._strip_protocol(path))
-            return client.is_file(norm_path)
+            result: bool = client.is_file(norm_path)
+            return result
         except Exception:
             return False
 
@@ -178,7 +184,7 @@ class YaDiskFileSystem(ObjectFileSystem):
         norm_path = self._normalize_path(self._strip_protocol(path))
         client.remove(norm_path, permanently=True)
 
-    def rm(self, path: str, recursive: bool = False, **kwargs: Any) -> None:
+    def rm(self, path: str, recursive: bool = False, **kwargs: Any) -> None:  # type: ignore[override]
         """Remove file or directory."""
         client = self._get_yadisk_client()
         norm_path = self._normalize_path(self._strip_protocol(path))
@@ -190,7 +196,7 @@ class YaDiskFileSystem(ObjectFileSystem):
         norm_path = self._normalize_path(self._strip_protocol(path))
         client.remove(norm_path, permanently=True)
 
-    def cat_file(self, path: str, **kwargs: Any) -> bytes:
+    def cat_file(self, path: str, **kwargs: Any) -> bytes:  # type: ignore[override]
         """Read file contents."""
         client = self._get_yadisk_client()
         norm_path = self._normalize_path(self._strip_protocol(path))
@@ -199,7 +205,7 @@ class YaDiskFileSystem(ObjectFileSystem):
         buffer.seek(0)
         return buffer.read()
 
-    def pipe_file(self, path: str, data: bytes, **kwargs: Any) -> None:
+    def pipe_file(self, path: str, data: bytes, **kwargs: Any) -> None:  # type: ignore[override]
         """Write data to file."""
         client = self._get_yadisk_client()
         norm_path = self._normalize_path(self._strip_protocol(path))
@@ -215,13 +221,13 @@ class YaDiskFileSystem(ObjectFileSystem):
         buffer = io.BytesIO(data)
         client.upload(buffer, norm_path, overwrite=True)
 
-    def get_file(self, rpath: str, lpath: str, **kwargs: Any) -> None:
+    def get_file(self, rpath: str, lpath: str, **kwargs: Any) -> None:  # type: ignore[override]
         """Download file from Yandex Disk to local path."""
         client = self._get_yadisk_client()
         norm_path = self._normalize_path(self._strip_protocol(rpath))
         client.download(norm_path, lpath)
 
-    def put_file(self, lpath: str, rpath: str, **kwargs: Any) -> None:
+    def put_file(self, lpath: str, rpath: str, **kwargs: Any) -> None:  # type: ignore[override]
         """Upload file from local path to Yandex Disk."""
         client = self._get_yadisk_client()
         norm_path = self._normalize_path(self._strip_protocol(rpath))
@@ -236,21 +242,21 @@ class YaDiskFileSystem(ObjectFileSystem):
 
         client.upload(lpath, norm_path, overwrite=True)
 
-    def cp_file(self, path1: str, path2: str, **kwargs: Any) -> None:
+    def cp_file(self, path1: str, path2: str, **kwargs: Any) -> None:  # type: ignore[override]
         """Copy file within Yandex Disk."""
         client = self._get_yadisk_client()
         src = self._normalize_path(self._strip_protocol(path1))
         dst = self._normalize_path(self._strip_protocol(path2))
         client.copy(src, dst, overwrite=True)
 
-    def mv(self, path1: str, path2: str, **kwargs: Any) -> None:
+    def mv(self, path1: str, path2: str, **kwargs: Any) -> None:  # type: ignore[override]
         """Move/rename file or directory."""
         client = self._get_yadisk_client()
         src = self._normalize_path(self._strip_protocol(path1))
         dst = self._normalize_path(self._strip_protocol(path2))
         client.move(src, dst, overwrite=True)
 
-    def checksum(self, path: str, **kwargs: Any) -> str | None:
+    def checksum(self, path: str, **kwargs: Any) -> str | None:  # type: ignore[override]
         """Get MD5 checksum for file."""
         info = self.info(path)
         return info.get("md5")
@@ -258,4 +264,5 @@ class YaDiskFileSystem(ObjectFileSystem):
     def size(self, path: str, **kwargs: Any) -> int:
         """Get file size in bytes."""
         info = self.info(path)
-        return info.get("size", 0)
+        size: int = info.get("size", 0)
+        return size

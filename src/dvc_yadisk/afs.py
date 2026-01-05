@@ -99,7 +99,8 @@ class AsyncYaDiskFS:
         """Check if path exists."""
         try:
             norm_path = self._normalize_path(path)
-            return await self._client.exists(norm_path)
+            result: bool = await self._client.exists(norm_path)
+            return result
         except Exception:
             return False
 
@@ -107,7 +108,8 @@ class AsyncYaDiskFS:
         """Check if path is a directory."""
         try:
             norm_path = self._normalize_path(path)
-            return await self._client.is_dir(norm_path)
+            result: bool = await self._client.is_dir(norm_path)
+            return result
         except Exception:
             return False
 
@@ -115,7 +117,8 @@ class AsyncYaDiskFS:
         """Check if path is a file."""
         try:
             norm_path = self._normalize_path(path)
-            return await self._client.is_file(norm_path)
+            result: bool = await self._client.is_file(norm_path)
+            return result
         except Exception:
             return False
 
@@ -213,7 +216,8 @@ class AsyncYaDiskFS:
     async def size(self, path: str, **kwargs: Any) -> int:
         """Get file size in bytes."""
         info = await self.info(path)
-        return info.get("size", 0)
+        size: int = info.get("size", 0)
+        return size
 
 
 class AsyncYaDiskFileSystem:

@@ -39,7 +39,7 @@ def _register_with_dvc() -> None:
 _register_with_dvc()
 
 
-def get_async_filesystem():
+def get_async_filesystem() -> type:
     """Get async filesystem class (lazy import to avoid import errors)."""
     from dvc_yadisk.afs import AsyncYaDiskFileSystem
 
