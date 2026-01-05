@@ -31,13 +31,15 @@ def enable() -> None:
             return
         # Append our import
         with open(sitecustomize_path, "a") as f:
-            f.write(f"\n# dvc-yadisk plugin\ntry:\n    {import_line}\nexcept ImportError:\n    pass\n")
+            f.write(f"\n# dvc-yadisk plugin\ntry:\n    {import_line}\n")
+            f.write("except ImportError:\n    pass\n")
     else:
         # Create new sitecustomize.py
         with open(sitecustomize_path, "w") as f:
-            f.write(f"# dvc-yadisk plugin\ntry:\n    {import_line}\nexcept ImportError:\n    pass\n")
+            f.write(f"# dvc-yadisk plugin\ntry:\n    {import_line}\n")
+            f.write("except ImportError:\n    pass\n")
 
-    print(f"dvc-yadisk enabled successfully!")
+    print("dvc-yadisk enabled successfully!")
     print(f"Created/updated: {sitecustomize_path}")
     print("\nYou can now use: dvc remote add myremote yadisk://path")
 
@@ -73,7 +75,13 @@ def disable() -> None:
         if skip_block and line.strip() == "":
             skip_block = False
             continue
-        if skip_block and ("import dvc_yadisk" in line or line.startswith("try:") or line.startswith("except") or line.strip() == "pass"):
+        is_dvc_yadisk_line = (
+            "import dvc_yadisk" in line
+            or line.startswith("try:")
+            or line.startswith("except")
+            or line.strip() == "pass"
+        )
+        if skip_block and is_dvc_yadisk_line:
             continue
         skip_block = False
         new_lines.append(line)

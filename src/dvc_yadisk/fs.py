@@ -81,7 +81,7 @@ class YaDiskFileSystem(ObjectFileSystem):
 
     @wrap_prop(threading.Lock())
     @cached_property
-    def fs(self) -> "YaDiskFileSystem":
+    def fs(self) -> YaDiskFileSystem:
         """Return self as the filesystem (required by ObjectFileSystem)."""
         return self
 
