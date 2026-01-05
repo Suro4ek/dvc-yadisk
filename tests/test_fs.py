@@ -200,13 +200,13 @@ class TestCredentials:
     def test_token_from_env(self) -> None:
         """Test credential preparation from environment."""
         with patch.dict(os.environ, {"YADISK_TOKEN": "env_token"}):
-            with patch("yadisk.Client") as mock_client_class:
+            with patch("dvc_yadisk.fs.Client") as mock_client_class:
                 mock_client = Mock()
                 mock_client.check_token.return_value = True
                 mock_client_class.return_value = mock_client
 
                 fs = YaDiskFileSystem()
-                client = fs._get_yadisk_client()
+                fs._get_yadisk_client()
 
                 mock_client_class.assert_called_once_with(token="env_token")
 

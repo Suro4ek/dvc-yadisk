@@ -5,13 +5,12 @@ from __future__ import annotations
 import io
 import os
 import threading
-from typing import TYPE_CHECKING, Any, ClassVar
+from collections.abc import Iterator
+from typing import Any, ClassVar
 
 from dvc_objects.fs.base import ObjectFileSystem
-
-if TYPE_CHECKING:
-    from yadisk import Client
 from funcy import cached_property, wrap_prop
+from yadisk import Client
 
 
 class YaDiskFileSystem(ObjectFileSystem):
@@ -61,13 +60,11 @@ class YaDiskFileSystem(ObjectFileSystem):
             return path[5:]
         return path
 
-    def _get_yadisk_client(self) -> Any:
+    def _get_yadisk_client(self) -> Client:
         """Get or create yadisk client (thread-safe)."""
         if self._yadisk_client is None:
             with self._yadisk_lock:
                 if self._yadisk_client is None:
-                    from yadisk import Client
-
                     token = self.fs_args.get("token") or os.environ.get("YADISK_TOKEN")
                     if not token:
                         raise ValueError(
@@ -95,7 +92,7 @@ class YaDiskFileSystem(ObjectFileSystem):
         meta = client.get_meta(norm_path)
         return {
             "name": meta.name,
-            "path": self._strip_disk_prefix(meta.path),
+            "path": self._strip_disk_prefix(meta.path or ""),
             "size": meta.size or 0,
             "type": "directory" if meta.type == "dir" else "file",
             "md5": getattr(meta, "md5", None),
@@ -111,14 +108,51 @@ class YaDiskFileSystem(ObjectFileSystem):
             return [
                 {
                     "name": item.name,
-                    "path": self._strip_disk_prefix(item.path),
+                    "path": self._strip_disk_prefix(item.path or ""),
                     "size": item.size or 0,
                     "type": "directory" if item.type == "dir" else "file",
                     "md5": getattr(item, "md5", None),
                 }
                 for item in items
             ]
-        return [self._strip_disk_prefix(item.path) for item in items]
+        return [self._strip_disk_prefix(item.path or "") for item in items]
+
+    def find(  # type: ignore[override]
+        self,
+        path: str,
+        prefix: str = "",
+        maxdepth: int | None = None,
+        **kwargs: Any,
+    ) -> Iterator[str]:
+        """Recursively find all files under path."""
+        client = self._get_yadisk_client()
+        base_path = self._strip_protocol(path)
+        norm_path = self._normalize_path(base_path)
+
+        def _find_recursive(current_path: str, depth: int) -> Iterator[str]:
+            if maxdepth is not None and depth > maxdepth:
+                return
+
+            try:
+                for item in client.listdir(current_path):
+                    item_path = self._strip_disk_prefix(item.path or "")
+                    # Remove leading slash for consistency
+                    item_path = item_path.lstrip("/")
+
+                    if not item_path:
+                        continue
+
+                    if prefix and not (item.name or "").startswith(prefix):
+                        continue
+
+                    if item.type == "dir":
+                        yield from _find_recursive(item.path or "", depth + 1)
+                    else:
+                        yield item_path
+            except Exception:
+                return
+
+        yield from _find_recursive(norm_path, 0)
 
     def exists(  # type: ignore[override]
         self, path: str | list[str], batch_size: int | None = None, **kwargs: Any

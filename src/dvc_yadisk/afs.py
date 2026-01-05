@@ -7,6 +7,8 @@ import os
 from collections.abc import AsyncIterator
 from typing import Any
 
+from yadisk import AsyncClient
+
 
 class AsyncYaDiskFS:
     """
@@ -255,8 +257,6 @@ class AsyncYaDiskFileSystem:
     async def _get_fs(self) -> AsyncYaDiskFS:
         """Get or create the async filesystem instance."""
         if self._fs is None:
-            from yadisk import AsyncClient
-
             credentials = self._prepare_credentials()
             client = AsyncClient(**credentials)
 
