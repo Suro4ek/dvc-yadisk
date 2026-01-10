@@ -138,12 +138,18 @@ class YaDiskFileSystem(ObjectFileSystem):
 
     def find(  # type: ignore[override]
         self,
-        path: str,
+        path: str | list[str],
         prefix: bool | str = False,
         maxdepth: int | None = None,
         **kwargs: Any,
     ) -> Iterator[str]:
-        """Recursively find all files under path."""
+        """Recursively find all files under path(s)."""
+        # Handle list of paths
+        if isinstance(path, (list, tuple)):
+            for p in path:
+                yield from self.find(p, prefix=prefix, maxdepth=maxdepth, **kwargs)
+            return
+
         prefix_str = ""
         if isinstance(prefix, str):
             prefix_str = prefix
