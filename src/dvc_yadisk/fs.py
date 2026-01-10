@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import io
 import os
 import threading
@@ -33,9 +32,7 @@ class YaDiskFileSystem(ObjectFileSystem):
         """Initialize YaDiskFileSystem."""
         super().__init__(**kwargs)
         self._yadisk_client: Client | None = None
-        self._async_client: AsyncClient | None = None
         self._yadisk_lock = threading.Lock()
-        self._async_lock: asyncio.Lock | None = None
         self._created_dirs: set[str] = set()
         self._token: str | None = None
 
@@ -88,18 +85,10 @@ class YaDiskFileSystem(ObjectFileSystem):
                     self._yadisk_client = client
         return self._yadisk_client
 
-    async def _get_async_client(self) -> AsyncClient:
-        """Get or create async yadisk client (with async lock)."""
-        if self._async_lock is None:
-            self._async_lock = asyncio.Lock()
-
-        async with self._async_lock:
-            if self._async_client is None:
-                token = self._get_token()
-                client = AsyncClient(token=token)
-                await client.__aenter__()  # type: ignore[no-untyped-call]
-                self._async_client = client
-        return self._async_client
+    def _create_async_client(self) -> AsyncClient:
+        """Create a new async yadisk client."""
+        token = self._get_token()
+        return AsyncClient(token=token)
 
     @wrap_prop(threading.Lock())  # type: ignore[untyped-decorator]
     @cached_property  # type: ignore[untyped-decorator]
@@ -309,16 +298,6 @@ class YaDiskFileSystem(ObjectFileSystem):
                 pass
             self._cache_parent_chain(norm_path)
 
-    async def _ensure_parent_dir_async(self, norm_path: str) -> None:
-        """Ensure parent directory exists (async version with caching)."""
-        parent = "/".join(norm_path.split("/")[:-1])
-        if parent and parent != "/" and parent not in self._created_dirs:
-            try:
-                client = await self._get_async_client()
-                await client.makedirs(parent)
-            except Exception:
-                pass
-            self._cache_parent_chain(norm_path)
 
     # Sync versions (fallback)
     def pipe_file(self, path: str, data: bytes, **kwargs: Any) -> None:  # type: ignore[override]
@@ -345,33 +324,45 @@ class YaDiskFileSystem(ObjectFileSystem):
     # Async versions for parallel operations
     async def _put_file(self, lpath: str, rpath: str, **kwargs: Any) -> None:
         """Async upload file from local path to Yandex Disk."""
-        client = await self._get_async_client()
         norm_path = self._normalize_path(self._strip_protocol(rpath))
-        await self._ensure_parent_dir_async(norm_path)
-        await client.upload(lpath, norm_path, overwrite=True)
+        async with self._create_async_client() as client:
+            await self._ensure_parent_dir_with_client(client, norm_path)
+            await client.upload(lpath, norm_path, overwrite=True)
 
     async def _get_file(self, rpath: str, lpath: str, **kwargs: Any) -> None:
         """Async download file from Yandex Disk to local path."""
-        client = await self._get_async_client()
         norm_path = self._normalize_path(self._strip_protocol(rpath))
-        await client.download(norm_path, lpath)
+        async with self._create_async_client() as client:
+            await client.download(norm_path, lpath)
 
     async def _pipe_file(self, path: str, data: bytes, **kwargs: Any) -> None:
         """Async write data to file."""
-        client = await self._get_async_client()
         norm_path = self._normalize_path(self._strip_protocol(path))
-        await self._ensure_parent_dir_async(norm_path)
-        buffer = io.BytesIO(data)
-        await client.upload(buffer, norm_path, overwrite=True)
+        async with self._create_async_client() as client:
+            await self._ensure_parent_dir_with_client(client, norm_path)
+            buffer = io.BytesIO(data)
+            await client.upload(buffer, norm_path, overwrite=True)
 
     async def _cat_file(self, path: str, **kwargs: Any) -> bytes:
         """Async read file contents."""
-        client = await self._get_async_client()
         norm_path = self._normalize_path(self._strip_protocol(path))
-        buffer = io.BytesIO()
-        await client.download(norm_path, buffer)
-        buffer.seek(0)
-        return buffer.read()
+        async with self._create_async_client() as client:
+            buffer = io.BytesIO()
+            await client.download(norm_path, buffer)
+            buffer.seek(0)
+            return buffer.read()
+
+    async def _ensure_parent_dir_with_client(
+        self, client: AsyncClient, norm_path: str
+    ) -> None:
+        """Ensure parent directory exists using provided async client."""
+        parent = "/".join(norm_path.split("/")[:-1])
+        if parent and parent != "/" and parent not in self._created_dirs:
+            try:
+                await client.makedirs(parent)
+            except Exception:
+                pass
+            self._cache_parent_chain(norm_path)
 
     def cp_file(self, path1: str, path2: str, **kwargs: Any) -> None:  # type: ignore[override]
         """Copy file within Yandex Disk."""
