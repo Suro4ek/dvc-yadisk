@@ -96,7 +96,9 @@ class YaDiskFileSystem(ObjectFileSystem):
         async with self._async_lock:
             if self._async_client is None:
                 token = self._get_token()
-                self._async_client = AsyncClient(token=token)
+                client = AsyncClient(token=token)
+                await client.__aenter__()  # type: ignore[no-untyped-call]
+                self._async_client = client
         return self._async_client
 
     @wrap_prop(threading.Lock())  # type: ignore[untyped-decorator]
