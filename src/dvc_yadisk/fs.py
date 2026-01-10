@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import io
 import os
 import threading
@@ -34,6 +35,7 @@ class YaDiskFileSystem(ObjectFileSystem):
         self._yadisk_client: Client | None = None
         self._async_client: AsyncClient | None = None
         self._yadisk_lock = threading.Lock()
+        self._async_lock: asyncio.Lock | None = None
         self._created_dirs: set[str] = set()
         self._token: str | None = None
 
@@ -87,12 +89,14 @@ class YaDiskFileSystem(ObjectFileSystem):
         return self._yadisk_client
 
     async def _get_async_client(self) -> AsyncClient:
-        """Get or create async yadisk client."""
-        if self._async_client is None:
-            token = self._get_token()
-            self._async_client = AsyncClient(token=token)
-            if not await self._async_client.check_token():
-                raise ValueError("Invalid Yandex Disk token")
+        """Get or create async yadisk client (with async lock)."""
+        if self._async_lock is None:
+            self._async_lock = asyncio.Lock()
+
+        async with self._async_lock:
+            if self._async_client is None:
+                token = self._get_token()
+                self._async_client = AsyncClient(token=token)
         return self._async_client
 
     @wrap_prop(threading.Lock())  # type: ignore[untyped-decorator]

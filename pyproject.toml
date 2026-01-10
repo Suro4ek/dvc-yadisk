@@ -1,6 +1,6 @@
 [project]
 name = "dvc-yadisk"
-version = "0.1.4"
+version = "0.1.5"
 description = "Yandex Disk remote storage plugin for DVC"
 readme = "README.md"
 license = "Apache-2.0"
@@ -23,6 +23,7 @@ requires-python = ">=3.9"
 dependencies = [
     "dvc>=3.0.0",
     "yadisk>=3.0.0",
+    "httpx>=0.24.0",
 ]
 
 [project.optional-dependencies]
