@@ -321,36 +321,60 @@ class YaDiskFileSystem(ObjectFileSystem):
         self._ensure_parent_dir(norm_path)
         client.upload(lpath, norm_path, overwrite=True)
 
-    # Async versions for parallel operations
+    # Async versions for parallel operations (with sync fallback)
     async def _put_file(self, lpath: str, rpath: str, **kwargs: Any) -> None:
         """Async upload file from local path to Yandex Disk."""
         norm_path = self._normalize_path(self._strip_protocol(rpath))
-        async with self._create_async_client() as client:
-            await self._ensure_parent_dir_with_client(client, norm_path)
-            await client.upload(lpath, norm_path, overwrite=True)
+        try:
+            async with self._create_async_client() as client:
+                await self._ensure_parent_dir_with_client(client, norm_path)
+                await client.upload(lpath, norm_path, overwrite=True)
+        except TypeError as e:
+            if "NoneType" in str(e):
+                self.put_file(lpath, rpath, **kwargs)
+            else:
+                raise
 
     async def _get_file(self, rpath: str, lpath: str, **kwargs: Any) -> None:
         """Async download file from Yandex Disk to local path."""
         norm_path = self._normalize_path(self._strip_protocol(rpath))
-        async with self._create_async_client() as client:
-            await client.download(norm_path, lpath)
+        try:
+            async with self._create_async_client() as client:
+                await client.download(norm_path, lpath)
+        except TypeError as e:
+            if "NoneType" in str(e):
+                self.get_file(rpath, lpath, **kwargs)
+            else:
+                raise
 
     async def _pipe_file(self, path: str, data: bytes, **kwargs: Any) -> None:
         """Async write data to file."""
         norm_path = self._normalize_path(self._strip_protocol(path))
-        async with self._create_async_client() as client:
-            await self._ensure_parent_dir_with_client(client, norm_path)
-            buffer = io.BytesIO(data)
-            await client.upload(buffer, norm_path, overwrite=True)
+        try:
+            async with self._create_async_client() as client:
+                await self._ensure_parent_dir_with_client(client, norm_path)
+                buffer = io.BytesIO(data)
+                await client.upload(buffer, norm_path, overwrite=True)
+        except TypeError as e:
+            if "NoneType" in str(e):
+                self.pipe_file(path, data, **kwargs)
+            else:
+                raise
 
     async def _cat_file(self, path: str, **kwargs: Any) -> bytes:
         """Async read file contents."""
         norm_path = self._normalize_path(self._strip_protocol(path))
-        async with self._create_async_client() as client:
-            buffer = io.BytesIO()
-            await client.download(norm_path, buffer)
-            buffer.seek(0)
-            return buffer.read()
+        try:
+            async with self._create_async_client() as client:
+                buffer = io.BytesIO()
+                await client.download(norm_path, buffer)
+                buffer.seek(0)
+                return buffer.read()
+        except TypeError as e:
+            if "NoneType" in str(e):
+                return self.cat_file(path, **kwargs)
+            else:
+                raise
 
     async def _ensure_parent_dir_with_client(
         self, client: AsyncClient, norm_path: str
