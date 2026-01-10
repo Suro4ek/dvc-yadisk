@@ -1,6 +1,6 @@
 [project]
 name = "dvc-yadisk"
-version = "0.1.7"
+version = "0.1.8"
 description = "Yandex Disk remote storage plugin for DVC"
 readme = "README.md"
 license = "Apache-2.0"
