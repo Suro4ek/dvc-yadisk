@@ -853,7 +853,8 @@ dependencies = [
     { name = "fsspec", version = "2025.12.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "funcy" },
     { name = "grandalf" },
-    { name = "gto" },
+    { name = "gto", version = "1.8.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "gto", version = "1.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "hydra-core" },
     { name = "iterative-telemetry" },
     { name = "kombu" },
@@ -1328,20 +1329,46 @@ wheels = [
 
 [[package]]
 name = "gto"
+version = "1.8.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.10'",
+]
+dependencies = [
+    { name = "entrypoints", marker = "python_full_version < '3.10'" },
+    { name = "funcy", marker = "python_full_version < '3.10'" },
+    { name = "pydantic", marker = "python_full_version < '3.10'" },
+    { name = "rich", marker = "python_full_version < '3.10'" },
+    { name = "ruamel-yaml", marker = "python_full_version < '3.10'" },
+    { name = "scmrepo", marker = "python_full_version < '3.10'" },
+    { name = "semver", marker = "python_full_version < '3.10'" },
+    { name = "tabulate", marker = "python_full_version < '3.10'" },
+    { name = "typer", marker = "python_full_version < '3.10'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6e/8b/0878e392a61e2f9b7d5ab62a1d00645d6de43ae58c738038e89ab5528650/gto-1.8.0.tar.gz", hash = "sha256:eeb95bbb99582232a9344923ebbb4158d9ee3102de9e782ff95f0e14123da228", size = 58944, upload-time = "2025-08-20T01:06:55.525Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4f/32/6bd3d6a0de08162dc9628cfa5ece0aca6e58ac1ff0af157d5058c1e147ef/gto-1.8.0-py3-none-any.whl", hash = "sha256:d91116bfbed0bcf669b1c2d2f4b4566afed8350e6dd42b105774e274943959f0", size = 45368, upload-time = "2025-08-20T01:06:53.765Z" },
+]
+
+[[package]]
+name = "gto"
 version = "1.9.0"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.11'",
+    "python_full_version == '3.10.*'",
+]
 dependencies = [
-    { name = "entrypoints" },
-    { name = "funcy" },
-    { name = "pydantic" },
-    { name = "pydantic-settings", version = "2.11.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
-    { name = "pydantic-settings", version = "2.12.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-    { name = "rich" },
-    { name = "ruamel-yaml" },
-    { name = "scmrepo" },
-    { name = "semver" },
-    { name = "tabulate" },
-    { name = "typer" },
+    { name = "entrypoints", marker = "python_full_version >= '3.10'" },
+    { name = "funcy", marker = "python_full_version >= '3.10'" },
+    { name = "pydantic", marker = "python_full_version >= '3.10'" },
+    { name = "pydantic-settings", marker = "python_full_version >= '3.10'" },
+    { name = "rich", marker = "python_full_version >= '3.10'" },
+    { name = "ruamel-yaml", marker = "python_full_version >= '3.10'" },
+    { name = "scmrepo", marker = "python_full_version >= '3.10'" },
+    { name = "semver", marker = "python_full_version >= '3.10'" },
+    { name = "tabulate", marker = "python_full_version >= '3.10'" },
+    { name = "typer", marker = "python_full_version >= '3.10'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/8a/06/d2ec91a6c1e6b1a55c419e8599df7ac3430323a1bb1e5c01a1f83f8ecb64/gto-1.9.0.tar.gz", hash = "sha256:3beb5c652a98585ad083dbb6879a580ffe926271661d9b7a50e428cd591005ea", size = 58999, upload-time = "2025-10-08T17:05:28.568Z" }
 wheels = [
@@ -2325,29 +2352,8 @@ wheels = [
 
 [[package]]
 name = "pydantic-settings"
-version = "2.11.0"
-source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version < '3.10'",
-]
-dependencies = [
-    { name = "pydantic", marker = "python_full_version < '3.10'" },
-    { name = "python-dotenv", marker = "python_full_version < '3.10'" },
-    { name = "typing-inspection", marker = "python_full_version < '3.10'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/20/c5/dbbc27b814c71676593d1c3f718e6cd7d4f00652cefa24b75f7aa3efb25e/pydantic_settings-2.11.0.tar.gz", hash = "sha256:d0e87a1c7d33593beb7194adb8470fc426e95ba02af83a0f23474a04c9a08180", size = 188394, upload-time = "2025-09-24T14:19:11.764Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/83/d6/887a1ff844e64aa823fb4905978d882a633cfe295c32eacad582b78a7d8b/pydantic_settings-2.11.0-py3-none-any.whl", hash = "sha256:fe2cea3413b9530d10f3a5875adffb17ada5c1e1bab0b2885546d7310415207c", size = 48608, upload-time = "2025-09-24T14:19:10.015Z" },
-]
-
-[[package]]
-name = "pydantic-settings"
 version = "2.12.0"
 source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.11'",
-    "python_full_version == '3.10.*'",
-]
 dependencies = [
     { name = "pydantic", marker = "python_full_version >= '3.10'" },
     { name = "python-dotenv", marker = "python_full_version >= '3.10'" },
@@ -2663,11 +2669,11 @@ wheels = [
 
 [[package]]
 name = "python-dotenv"
-version = "1.2.1"
+version = "1.2.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f0/26/19cadc79a718c5edbec86fd4919a6b6d3f681039a2f6d66d14be94e75fb9/python_dotenv-1.2.1.tar.gz", hash = "sha256:42667e897e16ab0d66954af0e60a9caa94f0fd4ecf3aaf6d2d260eec1aa36ad6", size = 44221, upload-time = "2025-10-26T15:12:10.434Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/82/ed/0301aeeac3e5353ef3d94b6ec08bbcabd04a72018415dcb29e588514bba8/python_dotenv-1.2.2.tar.gz", hash = "sha256:2c371a91fbd7ba082c2c1dc1f8bf89ca22564a087c2c287cd9b662adde799cf3", size = 50135, upload-time = "2026-03-01T16:00:26.196Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/14/1b/a298b06749107c305e1fe0f814c6c74aea7b2f1e10989cb30f544a1b3253/python_dotenv-1.2.1-py3-none-any.whl", hash = "sha256:b81ee9561e9ca4004139c6cbba3a238c32b03e4894671e181b671e8cb8425d61", size = 21230, upload-time = "2025-10-26T15:12:09.109Z" },
+    { url = "https://files.pythonhosted.org/packages/0b/d7/1959b9648791274998a9c3526f6d0ec8fd2233e4d4acce81bbae76b44b2a/python_dotenv-1.2.2-py3-none-any.whl", hash = "sha256:1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a", size = 22101, upload-time = "2026-03-01T16:00:25.09Z" },
 ]
 
 [[package]]
