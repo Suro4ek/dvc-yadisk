@@ -245,8 +245,8 @@ resolution-markers = [
     "python_full_version < '3.10'",
 ]
 dependencies = [
-    { name = "cryptography", marker = "python_full_version < '3.10'" },
-    { name = "typing-extensions", marker = "python_full_version < '3.10'" },
+    { name = "cryptography" },
+    { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/6b/b8/065c20bb5c9b8991648c0f25b13e445b4f51556cc3fdd0ad13ce4787c156/asyncssh-2.21.1.tar.gz", hash = "sha256:9943802955e2131536c2b1e71aacc68f56973a399937ed0b725086d7461c990c", size = 540515, upload-time = "2025-09-28T16:36:19.468Z" }
 wheels = [
@@ -262,8 +262,8 @@ resolution-markers = [
     "python_full_version == '3.10.*'",
 ]
 dependencies = [
-    { name = "cryptography", marker = "python_full_version >= '3.10'" },
-    { name = "typing-extensions", marker = "python_full_version >= '3.10'" },
+    { name = "cryptography" },
+    { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/fc/d5/957886c316466349d55c4de6a688a10a98295c0b4429deb8db1a17f3eb19/asyncssh-2.22.0.tar.gz", hash = "sha256:c3ce72b01be4f97b40e62844dd384227e5ff5a401a3793007c42f86a5c8eb537", size = 540523, upload-time = "2025-12-21T23:38:30.5Z" }
 wheels = [
@@ -560,7 +560,7 @@ resolution-markers = [
     "python_full_version < '3.10'",
 ]
 dependencies = [
-    { name = "colorama", marker = "python_full_version < '3.10' and sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b9/2e/0090cbf739cee7d23781ad4b89a9894a41538e4fcf4c31dcdd705b78eb8b/click-8.1.8.tar.gz", hash = "sha256:ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a", size = 226593, upload-time = "2024-12-21T18:38:44.339Z" }
 wheels = [
@@ -576,7 +576,7 @@ resolution-markers = [
     "python_full_version == '3.10.*'",
 ]
 dependencies = [
-    { name = "colorama", marker = "python_full_version >= '3.10' and sys_platform == 'win32'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/3d/fa/656b739db8587d7b5dfa22e22ed02566950fbfbcdc20311993483657a5c0/click-8.3.1.tar.gz", hash = "sha256:12ff4785d337a1bb490bb7e9c2b1ee5da3112e94a8622f26a6c77f5d2fc6842a", size = 295065, upload-time = "2025-11-15T20:45:42.706Z" }
 wheels = [
@@ -745,8 +745,8 @@ resolution-markers = [
     "python_full_version < '3.10'",
 ]
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.10'" },
-    { name = "urllib3", marker = "python_full_version < '3.10'" },
+    { name = "typing-extensions" },
+    { name = "urllib3" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/3e/7c/cb4a5fb0d3d0f6585894759730ae9052e8dd9d2e5172bff544d369b24243/dulwich-0.24.10.tar.gz", hash = "sha256:30e028979b6fa7220c913da9c786026611c10746c06496149742602b36a11f6b", size = 999843, upload-time = "2025-11-10T17:16:50.359Z" }
 wheels = [
@@ -791,8 +791,8 @@ resolution-markers = [
     "python_full_version == '3.10.*'",
 ]
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version >= '3.10' and python_full_version < '3.12'" },
-    { name = "urllib3", marker = "python_full_version >= '3.10'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+    { name = "urllib3" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/6f/97/f65ab4c7d999bb10c717cace283bfe60dcaa02993ba445574e217ae7c71e/dulwich-0.25.0.tar.gz", hash = "sha256:baa84b539fea0e6a925a9159c3e0a1d08cceeea5260732b84200e077444a4b0e", size = 1076943, upload-time = "2025-12-17T22:11:08.503Z" }
 wheels = [
@@ -1040,7 +1040,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
+    { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -1249,10 +1249,10 @@ wheels = [
 
 [package.optional-dependencies]
 http = [
-    { name = "aiohttp", marker = "python_full_version < '3.10'" },
+    { name = "aiohttp" },
 ]
 tqdm = [
-    { name = "tqdm", marker = "python_full_version < '3.10'" },
+    { name = "tqdm" },
 ]
 
 [[package]]
@@ -1270,10 +1270,10 @@ wheels = [
 
 [package.optional-dependencies]
 http = [
-    { name = "aiohttp", marker = "python_full_version >= '3.10'" },
+    { name = "aiohttp" },
 ]
 tqdm = [
-    { name = "tqdm", marker = "python_full_version >= '3.10'" },
+    { name = "tqdm" },
 ]
 
 [[package]]
@@ -1299,15 +1299,15 @@ wheels = [
 
 [[package]]
 name = "gitpython"
-version = "3.1.50"
+version = "3.1.57"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "gitdb" },
     { name = "typing-extensions", marker = "python_full_version < '3.10'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/33/f6/354ae6491228b5eb40e10d89c4d13c651fe1cf7556e35ebdded50cff57ce/gitpython-3.1.50.tar.gz", hash = "sha256:80da2d12504d52e1f998772dc5baf6e553f8d2fcfe1fcc226c9d9a2ee3372dcc", size = 219798, upload-time = "2026-05-06T04:01:26.571Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ba/0d/132ed135c871b6bf91adf16a0e43797cd535b81d4973b5d09291c54fc5ee/gitpython-3.1.57.tar.gz", hash = "sha256:c493ec57c0ef6b19743798b6a5af859c71814b524e7e6f97baa2f8e658961488", size = 225898, upload-time = "2026-07-26T07:33:26.351Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/20/7a/1c6e3562dfd8950adbb11ffbc65d21e7c89d01a6e4f137fa981056de25c5/gitpython-3.1.50-py3-none-any.whl", hash = "sha256:d352abe2908d07355014abdd21ddf798c2a961469239afec4962e9da884858f9", size = 212507, upload-time = "2026-05-06T04:01:23.799Z" },
+    { url = "https://files.pythonhosted.org/packages/41/6e/2139de986d9c7c3ac86f1f8be43858ce90bdfe2f7175e6c80c650ba15242/gitpython-3.1.57-py3-none-any.whl", hash = "sha256:4ccf7d73c10f5c9e76043fbb2675ac5a1b3ff5b41e648f56bcbed5f63792ecaf", size = 217151, upload-time = "2026-07-26T07:33:24.838Z" },
 ]
 
 [[package]]
@@ -1330,15 +1330,15 @@ resolution-markers = [
     "python_full_version < '3.10'",
 ]
 dependencies = [
-    { name = "entrypoints", marker = "python_full_version < '3.10'" },
-    { name = "funcy", marker = "python_full_version < '3.10'" },
-    { name = "pydantic", marker = "python_full_version < '3.10'" },
-    { name = "rich", marker = "python_full_version < '3.10'" },
-    { name = "ruamel-yaml", marker = "python_full_version < '3.10'" },
-    { name = "scmrepo", marker = "python_full_version < '3.10'" },
-    { name = "semver", marker = "python_full_version < '3.10'" },
-    { name = "tabulate", marker = "python_full_version < '3.10'" },
-    { name = "typer", marker = "python_full_version < '3.10'" },
+    { name = "entrypoints" },
+    { name = "funcy" },
+    { name = "pydantic" },
+    { name = "rich" },
+    { name = "ruamel-yaml" },
+    { name = "scmrepo" },
+    { name = "semver" },
+    { name = "tabulate" },
+    { name = "typer" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/6e/8b/0878e392a61e2f9b7d5ab62a1d00645d6de43ae58c738038e89ab5528650/gto-1.8.0.tar.gz", hash = "sha256:eeb95bbb99582232a9344923ebbb4158d9ee3102de9e782ff95f0e14123da228", size = 58944, upload-time = "2025-08-20T01:06:55.525Z" }
 wheels = [
@@ -1354,16 +1354,16 @@ resolution-markers = [
     "python_full_version == '3.10.*'",
 ]
 dependencies = [
-    { name = "entrypoints", marker = "python_full_version >= '3.10'" },
-    { name = "funcy", marker = "python_full_version >= '3.10'" },
-    { name = "pydantic", marker = "python_full_version >= '3.10'" },
-    { name = "pydantic-settings", marker = "python_full_version >= '3.10'" },
-    { name = "rich", marker = "python_full_version >= '3.10'" },
-    { name = "ruamel-yaml", marker = "python_full_version >= '3.10'" },
-    { name = "scmrepo", marker = "python_full_version >= '3.10'" },
-    { name = "semver", marker = "python_full_version >= '3.10'" },
-    { name = "tabulate", marker = "python_full_version >= '3.10'" },
-    { name = "typer", marker = "python_full_version >= '3.10'" },
+    { name = "entrypoints" },
+    { name = "funcy" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "rich" },
+    { name = "ruamel-yaml" },
+    { name = "scmrepo" },
+    { name = "semver" },
+    { name = "tabulate" },
+    { name = "typer" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/8a/06/d2ec91a6c1e6b1a55c419e8599df7ac3430323a1bb1e5c01a1f83f8ecb64/gto-1.9.0.tar.gz", hash = "sha256:3beb5c652a98585ad083dbb6879a580ffe926271661d9b7a50e428cd591005ea", size = 58999, upload-time = "2025-10-08T17:05:28.568Z" }
 wheels = [
@@ -1577,7 +1577,7 @@ resolution-markers = [
     "python_full_version < '3.10'",
 ]
 dependencies = [
-    { name = "mdurl", marker = "python_full_version < '3.10'" },
+    { name = "mdurl" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/38/71/3b932df36c1a044d397a1f92d1cf91ee0a503d91e470cbd670aa66b07ed0/markdown-it-py-3.0.0.tar.gz", hash = "sha256:e3f60a94fa066dc52ec76661e37c851cb232d92f9886b15cb560aaada2df8feb", size = 74596, upload-time = "2023-06-03T06:41:14.443Z" }
 wheels = [
@@ -1593,7 +1593,7 @@ resolution-markers = [
     "python_full_version == '3.10.*'",
 ]
 dependencies = [
-    { name = "mdurl", marker = "python_full_version >= '3.10'" },
+    { name = "mdurl" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/5b/f5/4ec618ed16cc4f8fb3b701563655a69816155e79e24a17b651541804721d/markdown_it_py-4.0.0.tar.gz", hash = "sha256:cb0a2b4aa34f932c007117b194e945bd74e0ec24133ceb5bac59009cda1cb9f3", size = 73070, upload-time = "2025-08-11T12:57:52.854Z" }
 wheels = [
@@ -2350,9 +2350,9 @@ name = "pydantic-settings"
 version = "2.12.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pydantic", marker = "python_full_version >= '3.10'" },
-    { name = "python-dotenv", marker = "python_full_version >= '3.10'" },
-    { name = "typing-inspection", marker = "python_full_version >= '3.10'" },
+    { name = "pydantic" },
+    { name = "python-dotenv" },
+    { name = "typing-inspection" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/43/4b/ac7e0aae12027748076d72a8764ff1c9d82ca75a7a52622e67ed3f765c54/pydantic_settings-2.12.0.tar.gz", hash = "sha256:005538ef951e3c2a68e1c08b292b5f2e71490def8589d4221b95dab00dafcfd0", size = 194184, upload-time = "2025-11-10T14:25:47.013Z" }
 wheels = [
@@ -2379,7 +2379,7 @@ resolution-markers = [
     "python_full_version < '3.10'",
 ]
 dependencies = [
-    { name = "cffi", marker = "python_full_version < '3.10'" },
+    { name = "cffi" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/53/77/d33e2c619478d0daea4a50f9ffdd588db2ca55817c7e9a6c796fca3b80ef/pygit2-1.15.1.tar.gz", hash = "sha256:e1fe8b85053d9713043c81eccc74132f9e5b603f209e80733d7955eafd22eb9d", size = 768818, upload-time = "2024-07-07T11:34:07.673Z" }
 wheels = [
@@ -2421,7 +2421,7 @@ resolution-markers = [
     "python_full_version == '3.10.*'",
 ]
 dependencies = [
-    { name = "cffi", marker = "python_full_version == '3.10.*'" },
+    { name = "cffi" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/2e/ea/762d00f6f518423cd889e39b12028844cc95f91a6413cf7136e184864821/pygit2-1.18.2.tar.gz", hash = "sha256:eca87e0662c965715b7f13491d5e858df2c0908341dee9bde2bc03268e460f55", size = 797200, upload-time = "2025-08-16T13:52:36.853Z" }
 wheels = [
@@ -2471,7 +2471,7 @@ resolution-markers = [
     "python_full_version >= '3.11'",
 ]
 dependencies = [
-    { name = "cffi", marker = "python_full_version >= '3.11'" },
+    { name = "cffi" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/17/49/cf8350817de19f4cafe4ae47881e38f56d9bbebaa9e5ef31a5458af4bcf8/pygit2-1.19.1.tar.gz", hash = "sha256:3165f784aae56a309a27d8eeae7923d53da2e8f6094308c7f5b428deec925cf9", size = 800869, upload-time = "2025-12-29T11:47:48.618Z" }
 wheels = [
@@ -2567,13 +2567,13 @@ resolution-markers = [
     "python_full_version < '3.10'",
 ]
 dependencies = [
-    { name = "colorama", marker = "python_full_version < '3.10' and sys_platform == 'win32'" },
-    { name = "exceptiongroup", marker = "python_full_version < '3.10'" },
-    { name = "iniconfig", version = "2.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
-    { name = "packaging", marker = "python_full_version < '3.10'" },
-    { name = "pluggy", marker = "python_full_version < '3.10'" },
-    { name = "pygments", marker = "python_full_version < '3.10'" },
-    { name = "tomli", marker = "python_full_version < '3.10'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "exceptiongroup" },
+    { name = "iniconfig", version = "2.1.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "packaging" },
+    { name = "pluggy" },
+    { name = "pygments" },
+    { name = "tomli" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a3/5c/00a0e072241553e1a7496d638deababa67c5058571567b92a7eaa258397c/pytest-8.4.2.tar.gz", hash = "sha256:86c0d0b93306b961d58d62a4db4879f27fe25513d4b969df351abdddb3c30e01", size = 1519618, upload-time = "2025-09-04T14:34:22.711Z" }
 wheels = [
@@ -2589,13 +2589,13 @@ resolution-markers = [
     "python_full_version == '3.10.*'",
 ]
 dependencies = [
-    { name = "colorama", marker = "python_full_version >= '3.10' and sys_platform == 'win32'" },
-    { name = "exceptiongroup", marker = "python_full_version == '3.10.*'" },
-    { name = "iniconfig", version = "2.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-    { name = "packaging", marker = "python_full_version >= '3.10'" },
-    { name = "pluggy", marker = "python_full_version >= '3.10'" },
-    { name = "pygments", marker = "python_full_version >= '3.10'" },
-    { name = "tomli", marker = "python_full_version == '3.10.*'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "exceptiongroup", marker = "python_full_version < '3.11'" },
+    { name = "iniconfig", version = "2.3.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "packaging" },
+    { name = "pluggy" },
+    { name = "pygments" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/d1/db/7ef3487e0fb0049ddb5ce41d3a49c235bf9ad299b6a25d5780a89f19230f/pytest-9.0.2.tar.gz", hash = "sha256:75186651a92bd89611d1d9fc20f0b4345fd827c41ccd5c299a868a05d70edf11", size = 1568901, upload-time = "2025-12-06T21:30:51.014Z" }
 wheels = [
@@ -2610,9 +2610,9 @@ resolution-markers = [
     "python_full_version < '3.10'",
 ]
 dependencies = [
-    { name = "backports-asyncio-runner", marker = "python_full_version < '3.10'" },
-    { name = "pytest", version = "8.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
-    { name = "typing-extensions", marker = "python_full_version < '3.10'" },
+    { name = "backports-asyncio-runner" },
+    { name = "pytest", version = "8.4.2", source = { registry = "https://pypi.org/simple" } },
+    { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/42/86/9e3c5f48f7b7b638b216e4b9e645f54d199d7abbbab7a64a13b4e12ba10f/pytest_asyncio-1.2.0.tar.gz", hash = "sha256:c609a64a2a8768462d0c99811ddb8bd2583c33fd33cf7f21af1c142e824ffb57", size = 50119, upload-time = "2025-09-12T07:33:53.816Z" }
 wheels = [
@@ -2628,9 +2628,9 @@ resolution-markers = [
     "python_full_version == '3.10.*'",
 ]
 dependencies = [
-    { name = "backports-asyncio-runner", marker = "python_full_version == '3.10.*'" },
-    { name = "pytest", version = "9.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-    { name = "typing-extensions", marker = "python_full_version >= '3.10' and python_full_version < '3.13'" },
+    { name = "backports-asyncio-runner", marker = "python_full_version < '3.11'" },
+    { name = "pytest", version = "9.0.2", source = { registry = "https://pypi.org/simple" } },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/90/2c/8af215c0f776415f3590cac4f9086ccefd6fd463befeae41cd4d3f193e5a/pytest_asyncio-1.3.0.tar.gz", hash = "sha256:d7f52f36d231b80ee124cd216ffb19369aa168fc10095013c6b014a34d3ee9e5", size = 50087, upload-time = "2025-11-10T16:07:47.256Z" }
 wheels = [
